@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Buat Item</title></head>
+<body>
+    <h2>Form Buat Item</h2>
+    <form method="POST">
+        Nama: <input type="text" name="nama" required><br><br>
+        Jumlah: <input type="number" name="jumlah" required><br><br>
+        <input type="submit" value="Simpan">
+    </form>
+    <a href="{{ url_for('dashboard') }}">Kembali</a>
+</body>
+</html>

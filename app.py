@@ -1,68 +1,47 @@
-import os
-from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+app.secret_key = 'rahasia'  # untuk session
 
+# Data login dummy
+USER_CREDENTIALS = {
+    'admin': 'admin'
+}
 
-project_dir = os.path.dirname(os.path.abspath(__file__))
-database_file = "sqlite:///{}".format(
-    os.path.join(project_dir, "moviedatabase.db"))
+@app.route("/")
+def index():
+    return render_template("login.html")
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = database_file
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.form["username"]
+    password = request.form["password"]
+    if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
+        session['user'] = username
+        return redirect(url_for('dashboard'))
+    return "Login gagal! <a href='/'>Coba lagi</a>"
 
-db = SQLAlchemy(app)
+@app.route("/dashboard")
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    return render_template("dashboard.html")
 
+@app.route("/create", methods=["GET", "POST"])
+def create():
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    if request.method == "POST":
+        nama = request.form["nama"]
+        jumlah = request.form["jumlah"]
+        print(f"Data disimpan: {nama}, jumlah: {jumlah}")
+        return render_template("success.html")
+    return render_template("create.html")
 
-class Movie(db.Model):
-    title = db.Column(db.String(80), unique=True,
-                      nullable=False, primary_key=True)
-
-    def __repr__(self):
-        return "<Title: {}>".format(self.title)
-
-
-@app.route("/", methods=["GET", "POST"])
-def home():
-    if request.form:
-        try:
-            movie = Movie(title=request.form.get("title"))
-            db.session.add(movie)
-            db.session.commit()
-        except Exception as e:
-            print("Failed to add movie")
-            print(e)
-    movies = Movie.query.all()
-    return render_template("home.html", movies=movies)
-
-
-@app.route("/update", methods=["POST"])
-def update():
-    try:
-        newtitle = request.form.get("newtitle")
-        oldtitle = request.form.get("oldtitle")
-        movie = Movie.query.filter_by(title=oldtitle).first()
-        movie.title = newtitle
-        db.session.commit()
-    except Exception as e:
-        print("Couldn't update movie title")
-        print(e)
-    return redirect("/")
-
-
-@app.route("/delete", methods=["POST"])
-def delete():
-    try:
-        title = request.form.get("title")
-        movie = Movie.query.filter_by(title=title).first()
-        db.session.delete(movie)
-        db.session.commit()
-    except Exception as e:
-        print("Couldn't delete movie title")
-        print(e)
-    return redirect("/")
-
+@app.route("/logout")
+def logout():
+    session.pop('user', None)
+    return render_template("logout.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8080)

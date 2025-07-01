@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+    <h2>Selamat datang, {{ session['user'] }}</h2>
+    <a href="{{ url_for('create') }}">Tambah Item</a><br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
