@@ -1,0 +1,19 @@
+# Black-Box Testing - Library App
+
+## Tools
+- Selenium IDE
+- Browser: Chrome
+- Base URL: https://username-xxxxx.githubpreview.dev/
+
+## Skenario Diuji
+1. Register akun
+2. Login
+3. Pinjam buku
+4. Logout
+
+## Hasil
+✅ Semua fungsi berjalan **lancar** tanpa error.
+
+### File:
+- `blackbox_test.side` – File skrip Selenium
+- `pass.png` – Bukti berhasil
